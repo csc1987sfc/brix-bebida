@@ -3,24 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Control Brix - Todo en Uno</title>
+    <title>Control Planta - PRO</title>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#e00020">
+    <meta name="theme-color" content="#212121">
     <style>
-        :root { --bg: #e9ecef; --text: #333; --primary: #e00020; --card: #fff; }
+        :root { --bg: #e9ecef; --text: #333; --card: #fff; --purple: #6a1b9a; }
         * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background: var(--bg); color: var(--text); padding: 15px; margin: 0; display: flex; flex-direction: column; align-items: center; }
         .container { background: var(--card); padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 100%; max-width: 400px; margin-bottom: 20px; }
-        h2 { text-align: center; margin-top: 0; color: var(--primary); font-size: 1.4em; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; }
-        h2.blue-title { color: #1565c0; }
+        
+        /* Colores por sección */
+        .title-norm { color: #e00020; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; margin-top: 0; text-align: center; }
+        .title-brix { color: #1565c0; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; margin-top: 0; text-align: center; }
+        .title-acid { color: #e65100; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; margin-top: 0; text-align: center; }
+        .title-inv { color: var(--purple); border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; margin-top: 0; text-align: center; }
+        
         label { display: block; margin-bottom: 6px; font-weight: bold; font-size: 0.9em; color: #555; }
         input, select { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; background-color: #fafafa; }
-        input:focus, select:focus { outline: none; border-color: var(--primary); background-color: #fff; }
+        input:focus { outline: none; background-color: #fff; }
+        
+        /* Focus styles */
+        .focus-norm:focus { border-color: #e00020; box-shadow: 0 0 0 2px rgba(224,0,32,0.2); }
+        .focus-brix:focus { border-color: #1565c0; box-shadow: 0 0 0 2px rgba(21,101,192,0.2); }
+        .focus-acid:focus { border-color: #e65100; box-shadow: 0 0 0 2px rgba(230,81,0,0.2); }
+        .focus-inv:focus { border-color: var(--purple); box-shadow: 0 0 0 2px rgba(106,27,154,0.2); }
+
         .result-box { text-align: center; background: #f8f9fa; padding: 15px; border-radius: 8px; margin-top: 5px; border: 1px solid #e9ecef; }
-        .main-value { font-size: 2.2em; font-weight: bold; transition: color 0.3s; }
-        .color-red { color: #e00020; }
-        .color-blue { color: #1565c0; }
+        .main-value { font-size: 2.2em; font-weight: bold; }
+        
+        .color-norm { color: #e00020; }
+        .color-brix { color: #1565c0; }
+        .color-acid { color: #e65100; }
+        .color-inv { color: var(--purple); }
+        
         .sub-text { font-size: 0.9em; color: #666; margin-top: 5px; }
         .deviation { font-weight: bold; margin-top: 5px; }
         .good { color: #2e7d32; }
@@ -32,76 +48,111 @@
 
 <!-- BLOQUE 1: CALCULADORA NORMAL -->
 <div class="container">
-    <h2 id="title-normal">1. Calculadora Normal</h2>
-    
+    <h2 class="title-norm" id="title-normal">1. Calculadora Normal</h2>
     <label for="producto">Producto en línea:</label>
-    <select id="producto" onchange="updateUINormal()">
+    <select id="producto" class="focus-norm" onchange="updateUINormal()">
         <option value="coca-cola" data-target="10.37" data-color="#e00020">Coca-Cola (Obj: 10,37)</option>
         <option value="fanta-naranja" data-target="4.5" data-color="#f57c00">Fanta Naranja (Obj: 4,5)</option>
         <option value="fanta-limon" data-target="4.8" data-color="#fbc02d">Fanta Limón (Obj: 4,8)</option>
     </select>
-
     <label for="brixJarabeNorm">Brix del Jarabe:</label>
-    <input type="text" id="brixJarabeNorm" inputmode="decimal" placeholder="Ej: 54,85" oninput="calcularNormal()">
-
+    <input type="text" id="brixJarabeNorm" class="focus-norm" inputmode="decimal" placeholder="Ej: 54,85" oninput="calcularNormal()">
     <label for="densidadNorm">Densidad Jarabe (kg/L):</label>
-    <input type="text" id="densidadNorm" inputmode="decimal" value="1,26" oninput="calcularNormal()">
-
+    <input type="text" id="densidadNorm" class="focus-norm" inputmode="decimal" value="1,26" oninput="calcularNormal()">
     <label for="ratioNorm">Ratio (L agua / L jarabe):</label>
-    <input type="text" id="ratioNorm" inputmode="decimal" value="5,4" oninput="calcularNormal()">
-
+    <input type="text" id="ratioNorm" class="focus-norm" inputmode="decimal" value="5,4" oninput="calcularNormal()">
     <div class="result-box">
         <div style="font-size: 1em; margin-bottom: 5px;">Brix en Bebida:</div>
-        <div class="main-value color-red" id="resultadoNorm">0,00</div>
+        <div class="main-value color-norm" id="resultadoNorm">0,00</div>
         <div class="sub-text" id="objetivoNorm">Objetivo: 10,37</div>
         <div class="deviation" id="desviacionNorm">Diferencia: 0,00</div>
     </div>
 </div>
 
-<!-- BLOQUE 2: CORRECCIÓN DE TANQUE -->
+<!-- BLOQUE 2: CORRECCIÓN DE TANQUE (BRIX) -->
 <div class="container">
-    <h2 class="blue-title">2. Corrección 2º Llenado</h2>
-    
+    <h2 class="title-brix">2. Corrección Tanque (BRIX)</h2>
     <label for="brixJarabeCorr">Brix del Jarabe (Entrada):</label>
-    <input type="text" id="brixJarabeCorr" inputmode="decimal" placeholder="Ej: 54,87" oninput="calcularCorreccion()">
-
-    <label for="densidadCorr">Densidad Jarabe (kg/L):</label>
-    <input type="text" id="densidadCorr" inputmode="decimal" value="1,26" oninput="calcularCorreccion()">
-
+    <input type="text" id="brixJarabeCorr" class="focus-brix" inputmode="decimal" placeholder="Ej: 54,87" oninput="calcularCorreccionBrix()">
+    <label for="densidadCorrBrix">Densidad Jarabe (kg/L):</label>
+    <input type="text" id="densidadCorrBrix" class="focus-brix" inputmode="decimal" value="1,26" oninput="calcularCorreccionBrix()">
     <label for="brixActualCorr">Brix 1ª Mezcla (Tanque):</label>
-    <input type="text" id="brixActualCorr" inputmode="decimal" placeholder="Ej: 10,22" oninput="calcularCorreccion()">
-
+    <input type="text" id="brixActualCorr" class="focus-brix" inputmode="decimal" placeholder="Ej: 10,22" oninput="calcularCorreccionBrix()">
     <label for="brixObjetivoCorr">Brix Objetivo Final:</label>
-    <input type="text" id="brixObjetivoCorr" inputmode="decimal" value="10,37" oninput="calcularCorreccion()">
-
+    <input type="text" id="brixObjetivoCorr" class="focus-brix" inputmode="decimal" value="10,37" oninput="calcularCorreccionBrix()">
     <div class="result-box">
         <div class="sub-text" id="brixSegundoCorr">Brix para compensar: 0,00</div>
         <div style="font-weight: bold; margin-bottom: 5px; margin-top: 10px;">Nuevo Ratio de Agua:</div>
-        <div class="main-value color-blue" id="resultadoRatioCorr">0,00</div>
+        <div class="main-value color-brix" id="resultadoRatioBrix">0,00</div>
         <div class="note">* Asume volúmenes iguales (Ej: 800L + 800L).</div>
     </div>
 </div>
 
+<!-- BLOQUE 3: CORRECCIÓN DE TANQUE (ACIDEZ) -->
+<div class="container">
+    <h2 class="title-acid">3. Corrección Tanque (ACIDEZ)</h2>
+    <label for="acidezJarabe">Acidez del Jarabe (Entrada):</label>
+    <input type="text" id="acidezJarabe" class="focus-acid" inputmode="decimal" placeholder="Ej: 1,50" oninput="calcularCorreccionAcidez()">
+    <label for="densidadCorrAcid">Densidad Jarabe (kg/L):</label>
+    <input type="text" id="densidadCorrAcid" class="focus-acid" inputmode="decimal" value="1,26" oninput="calcularCorreccionAcidez()">
+    <label for="acidezActual">Acidez 1ª Mezcla (Tanque):</label>
+    <input type="text" id="acidezActual" class="focus-acid" inputmode="decimal" placeholder="Ej: 0,12" oninput="calcularCorreccionAcidez()">
+    <label for="acidezObjetivo">Acidez Objetivo Final:</label>
+    <input type="text" id="acidezObjetivo" class="focus-acid" inputmode="decimal" placeholder="Ej: 0,15" oninput="calcularCorreccionAcidez()">
+    <div class="result-box">
+        <div class="sub-text" id="acidezSegundoCorr">Acidez para compensar: 0,00</div>
+        <div style="font-weight: bold; margin-bottom: 5px; margin-top: 10px;">Nuevo Ratio de Agua:</div>
+        <div class="main-value color-acid" id="resultadoRatioAcid">0,00</div>
+    </div>
+</div>
+
+<!-- BLOQUE 4: ANALIZADOR DE INVERSIÓN (LABORATORIO) -->
+<div class="container">
+    <h2 class="title-inv">4. Analizador de Inversión (Lab)</h2>
+    
+    <label for="labBajo">Brix BAJO del aparato (Fresco):</label>
+    <input type="text" id="labBajo" class="focus-inv" inputmode="decimal" placeholder="Ej: 10,22" oninput="calcularInversionLab()">
+    
+    <label for="labAlto">Brix ALTO del aparato (Invertido):</label>
+    <input type="text" id="labAlto" class="focus-inv" inputmode="decimal" placeholder="Ej: 10,29" oninput="calcularInversionLab()">
+    
+    <label for="jarabeBaseLab" style="margin-top: 15px; border-top: 1px dashed #ccc; padding-top: 10px;">Brix Jarabe Normal (Receta):</label>
+    <input type="text" id="jarabeBaseLab" class="focus-inv" inputmode="decimal" value="54,8" oninput="calcularInversionLab()">
+    
+    <label for="objetivoBaseLab">Nominal Bebida Normal (Base):</label>
+    <input type="text" id="objetivoBaseLab" class="focus-inv" inputmode="decimal" value="10,37" oninput="calcularInversionLab()">
+
+    <div class="result-box">
+        <div style="font-weight: bold; margin-bottom: 5px; color: #444;">1. Nuevo Objetivo en Máquina:</div>
+        <div class="main-value color-inv" id="resNuevoObjetivo">0,00</div>
+        
+        <div style="font-weight: bold; margin-bottom: 5px; margin-top: 15px; color: #444;">2. Brix Jarabe Invertido:</div>
+        <div class="main-value color-inv" style="font-size: 1.8em;" id="resJarabeInvertido">0,00</div>
+        <div class="note">* Copia este jarabe si necesitas usar la calculadora Azul.</div>
+    </div>
+</div>
+
 <script>
-    // Función global para leer números con coma
     function parseInput(val) {
         if (!val) return 0;
         return parseFloat(val.replace(',', '.'));
     }
 
-    // --- LÓGICA CALCULADORA NORMAL ---
+    // --- 1. LÓGICA CALCULADORA NORMAL ---
     function updateUINormal() {
         const select = document.getElementById('producto');
         const option = select.options[select.selectedIndex];
         const color = option.getAttribute('data-color');
-        
         document.getElementById('title-normal').style.color = color;
         document.getElementById('resultadoNorm').style.color = color;
-        
         if (select.value === 'coca-cola') {
             document.getElementById('densidadNorm').value = '1,26';
+            document.getElementById('densidadCorrBrix').value = '1,26';
+            document.getElementById('densidadCorrAcid').value = '1,26';
         } else {
             document.getElementById('densidadNorm').value = '1,10'; 
+            document.getElementById('densidadCorrBrix').value = '1,10';
+            document.getElementById('densidadCorrAcid').value = '1,10';
         }
         calcularNormal();
     }
@@ -110,52 +161,81 @@
         const brixJarabe = parseInput(document.getElementById('brixJarabeNorm').value);
         const densidad = parseInput(document.getElementById('densidadNorm').value);
         const ratio = parseInput(document.getElementById('ratioNorm').value);
-        
         const select = document.getElementById('producto');
         const target = parseFloat(select.options[select.selectedIndex].getAttribute('data-target'));
-
         if (brixJarabe > 0 && densidad > 0 && ratio > 0) {
             const brixFinal = ((densidad * (brixJarabe / 100)) / (densidad + ratio)) * 100;
             const diferencia = brixFinal - target;
-
             document.getElementById('resultadoNorm').innerText = brixFinal.toFixed(2).replace('.', ',');
             document.getElementById('objetivoNorm').innerText = 'Objetivo: ' + target.toFixed(2).replace('.', ',');
-            
             const devElement = document.getElementById('desviacionNorm');
             const difTexto = (diferencia > 0 ? '+' : '') + diferencia.toFixed(2).replace('.', ',');
             devElement.innerText = 'Diferencia: ' + difTexto;
-            
-            if (Math.abs(diferencia) <= 0.05) {
-                devElement.className = 'deviation good';
-            } else {
-                devElement.className = 'deviation bad';
-            }
+            if (Math.abs(diferencia) <= 0.05) devElement.className = 'deviation good';
+            else devElement.className = 'deviation bad';
         } else {
             document.getElementById('resultadoNorm').innerText = '0,00';
             document.getElementById('desviacionNorm').innerText = 'Diferencia: 0,00';
         }
     }
 
-    // --- LÓGICA CORRECCIÓN TANQUE ---
-    function calcularCorreccion() {
+    // --- 2. LÓGICA CORRECCIÓN BRIX ---
+    function calcularCorreccionBrix() {
         const brixJarabe = parseInput(document.getElementById('brixJarabeCorr').value);
-        const densidad = parseInput(document.getElementById('densidadCorr').value);
+        const densidad = parseInput(document.getElementById('densidadCorrBrix').value);
         const brixActual = parseInput(document.getElementById('brixActualCorr').value);
         const brixObjetivo = parseInput(document.getElementById('brixObjetivoCorr').value);
-
         if (brixJarabe > 0 && densidad > 0 && brixActual > 0 && brixObjetivo > 0) {
-            const brixSegundoLlenado = brixObjetivo + (brixObjetivo - brixActual);
-            const nuevoRatio = ((densidad * brixJarabe) / brixSegundoLlenado) - densidad;
-
-            document.getElementById('brixSegundoCorr').innerText = 'Brix para compensar: ' + brixSegundoLlenado.toFixed(2).replace('.', ',');
-            document.getElementById('resultadoRatioCorr').innerText = nuevoRatio.toFixed(2).replace('.', ',');
+            const brixSegundo = brixObjetivo + (brixObjetivo - brixActual);
+            const nuevoRatio = ((densidad * brixJarabe) / brixSegundo) - densidad;
+            document.getElementById('brixSegundoCorr').innerText = 'Brix para compensar: ' + brixSegundo.toFixed(2).replace('.', ',');
+            document.getElementById('resultadoRatioBrix').innerText = nuevoRatio.toFixed(2).replace('.', ',');
         } else {
             document.getElementById('brixSegundoCorr').innerText = 'Brix para compensar: 0,00';
-            document.getElementById('resultadoRatioCorr').innerText = '0,00';
+            document.getElementById('resultadoRatioBrix').innerText = '0,00';
         }
     }
 
-    // Inicializar al cargar la página
+    // --- 3. LÓGICA CORRECCIÓN ACIDEZ ---
+    function calcularCorreccionAcidez() {
+        const acidezJarabe = parseInput(document.getElementById('acidezJarabe').value);
+        const densidad = parseInput(document.getElementById('densidadCorrAcid').value);
+        const acidezActual = parseInput(document.getElementById('acidezActual').value);
+        const acidezObjetivo = parseInput(document.getElementById('acidezObjetivo').value);
+        if (acidezJarabe > 0 && densidad > 0 && acidezActual > 0 && acidezObjetivo > 0) {
+            const acidezSegundo = acidezObjetivo + (acidezObjetivo - acidezActual);
+            const nuevoRatio = ((densidad * acidezJarabe) / acidezSegundo) - densidad;
+            document.getElementById('acidezSegundoCorr').innerText = 'Acidez para compensar: ' + acidezSegundo.toFixed(4).replace('.', ',');
+            document.getElementById('resultadoRatioAcid').innerText = nuevoRatio.toFixed(2).replace('.', ',');
+        } else {
+            document.getElementById('acidezSegundoCorr').innerText = 'Acidez para compensar: 0,00';
+            document.getElementById('resultadoRatioAcid').innerText = '0,00';
+        }
+    }
+
+    // --- 4. LÓGICA ANALIZADOR DE INVERSIÓN LAB ---
+    function calcularInversionLab() {
+        const labBajo = parseInput(document.getElementById('labBajo').value);
+        const labAlto = parseInput(document.getElementById('labAlto').value);
+        const jarabeBase = parseInput(document.getElementById('jarabeBaseLab').value);
+        const objetivoBase = parseInput(document.getElementById('objetivoBaseLab').value);
+
+        if (labBajo > 0 && labAlto > 0 && jarabeBase > 0 && objetivoBase > 0) {
+            // Sacar el factor multiplicador exacto
+            const factor = labAlto / labBajo;
+            
+            // Calcular los nuevos valores
+            const nuevoObjetivo = objetivoBase * factor;
+            const jarabeInvertido = jarabeBase * factor;
+
+            document.getElementById('resNuevoObjetivo').innerText = nuevoObjetivo.toFixed(2).replace('.', ',');
+            document.getElementById('resJarabeInvertido').innerText = jarabeInvertido.toFixed(2).replace('.', ',');
+        } else {
+            document.getElementById('resNuevoObjetivo').innerText = '0,00';
+            document.getElementById('resJarabeInvertido').innerText = '0,00';
+        }
+    }
+
     updateUINormal();
 </script>
 
