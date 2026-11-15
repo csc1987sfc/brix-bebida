@@ -148,19 +148,19 @@
             margin-bottom: 3px;
         }
 
-        .syrup-field input {
+        .syrup-field input, .syrup-field select {
             width: 100%;
             padding: 8px;
             border: 1.5px solid #cbd5e1;
             border-radius: 7px;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 700;
             text-align: center;
             background: #f8fafc;
             color: #0f172a;
         }
 
-        .syrup-field input:focus {
+        .syrup-field input:focus, .syrup-field select:focus {
             outline: none;
             border-color: #2563eb;
             background: #fff;
@@ -344,51 +344,121 @@
             color: #b91c1c !important;
         }
 
-        /* TARJETA DE AYUDA Y DESGLOSE DEL CÍRCULO */
+        /* TARJETA DE CÁLCULO DE OFFSET POR BRIX DE BEBIDA DESEADO */
         .helper-card {
             background: #fff;
             border-radius: 10px;
             padding: 12px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.08);
             margin-bottom: 14px;
+            border-top: 4px solid #1d4ed8;
         }
 
         .helper-title {
-            font-size: 0.86em;
+            font-size: 0.9em;
             font-weight: 800;
             color: #0f172a;
             margin: 0 0 8px 0;
         }
 
-        .preset-btns {
+        .target-solver-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr 1.15fr;
             gap: 8px;
+            align-items: stretch;
             margin-bottom: 8px;
         }
 
-        .preset-btn {
-            background: #f1f5f9;
-            border: 1.5px solid #94a3b8;
+        .target-input-box {
+            background: #f8fafc;
+            border: 1.5px solid #cbd5e1;
             border-radius: 8px;
-            padding: 8px 6px;
-            font-size: 0.8em;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .target-input-box label {
+            font-size: 0.74em;
             font-weight: 700;
-            color: #1e293b;
-            cursor: pointer;
+            color: #475569;
+            margin-bottom: 4px;
             text-align: center;
         }
 
-        .preset-btn:active {
-            background: #dbeafe;
-            border-color: #2563eb;
+        .target-input-box input {
+            width: 100%;
+            padding: 7px;
+            border: 1.5px solid #2563eb;
+            border-radius: 6px;
+            font-size: 18px;
+            font-weight: 800;
+            text-align: center;
+            color: #0f172a;
+            background: #fff;
         }
 
-        .preset-btn span {
-            display: block;
-            font-size: 1.15em;
+        .target-result-box {
+            background: #eff6ff;
+            border: 1.5px solid #93c5fd;
+            border-radius: 8px;
+            padding: 8px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .target-result-label {
+            font-size: 0.74em;
+            font-weight: 700;
+            color: #1e40af;
+        }
+
+        .target-result-value {
+            font-size: 1.45em;
+            font-weight: 900;
             color: #1d4ed8;
-            margin-top: 2px;
+            margin: 2px 0;
+        }
+
+        .apply-btn {
+            background: #1d4ed8;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 6px 8px;
+            font-size: 0.78em;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .apply-btn:active {
+            background: #1e40af;
+        }
+
+        .quick-pills {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+
+        .pill-btn {
+            flex: 1;
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 5px;
+            font-size: 0.76em;
+            font-weight: 700;
+            color: #334155;
+            cursor: pointer;
+        }
+
+        .pill-btn:active {
+            background: #dbeafe;
         }
 
         .helper-info {
@@ -487,6 +557,13 @@
                     <label for="m1-desfase">Desfase B136.FIT (°Bx):</label>
                     <input type="text" id="m1-desfase" inputmode="decimal" value="-0,46" oninput="onDesfaseInput(1)">
                 </div>
+                <div class="syrup-field" style="grid-column: span 2;">
+                    <label for="m1-modo">Al cambiar el Brix real del jarabe:</label>
+                    <select id="m1-modo" onchange="calcularMezcladora(1)">
+                        <option value="directo" selected>Variar Brix final de bebida (mantener dosificación actual)</option>
+                        <option value="auto">Lazo automático PLC (corregir componente y mantener bebida)</option>
+                    </select>
+                </div>
             </div>
         </div>
 
@@ -504,34 +581,31 @@
             <div class="hmi-body">
                 <!-- FILA SUPERIOR -->
                 <div class="hmi-row-top">
-                    <!-- Arriba Izquierda -->
                     <div class="hmi-box" style="margin-top: 14px;">
                         <div class="hmi-box-title">Valor nominal Brix del jarabe</div>
                         <div class="hmi-input-wrap">
-                            <input type="text" id="m1-jarabe-nom" inputmode="decimal" value="54,80" oninput="calcularMezcladora(1)">
+                            <input type="text" id="m1-jarabe-nom" inputmode="decimal" value="54,80" oninput="onHmiParamInput(1)">
                             <span class="hmi-unit">°Brix</span>
                         </div>
                     </div>
 
-                    <!-- Arriba Centro (2 cajas apiladas) -->
                     <div>
                         <div class="hmi-box" style="margin-bottom: 6px;">
                             <div class="hmi-box-title">Valor nominal Brix del producto</div>
                             <div class="hmi-input-wrap">
-                                <input type="text" id="m1-prod-nom" inputmode="decimal" value="10,50" oninput="calcularMezcladora(1)">
+                                <input type="text" id="m1-prod-nom" inputmode="decimal" value="10,50" oninput="onHmiParamInput(1)">
                                 <span class="hmi-unit">°Brix</span>
                             </div>
                         </div>
                         <div class="hmi-box">
                             <div class="hmi-box-title">Valor nominal Brix del offset de producto</div>
                             <div class="hmi-input-wrap">
-                                <input type="text" id="m1-prod-offset" inputmode="decimal" value="0,00" oninput="calcularMezcladora(1)">
+                                <input type="text" id="m1-prod-offset" inputmode="decimal" value="0,00" oninput="onHmiParamInput(1)">
                                 <span class="hmi-unit">°Brix</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Arriba Derecha (Lector de jarabe B136.FIT) -->
                     <div style="margin-top: 2px;">
                         <div class="sensor-tag">B136.FIT</div>
                         <div class="hmi-box">
@@ -568,7 +642,7 @@
                     <div class="hmi-box">
                         <div class="hmi-box-title">Proporción de agua</div>
                         <div class="hmi-input-wrap">
-                            <input type="text" id="m1-agua" inputmode="decimal" value="5,400" oninput="calcularMezcladora(1)">
+                            <input type="text" id="m1-agua" inputmode="decimal" value="5,400" oninput="onHmiParamInput(1)">
                         </div>
                     </div>
 
@@ -576,7 +650,7 @@
                         <div class="hmi-box">
                             <div class="hmi-box-title">Valor nominal offset</div>
                             <div class="hmi-input-wrap">
-                                <input type="text" id="m1-offset-nom" inputmode="decimal" value="-0,030" oninput="calcularMezcladora(1)">
+                                <input type="text" id="m1-offset-nom" inputmode="decimal" value="-0,030" oninput="onHmiParamInput(1)">
                             </div>
                         </div>
                         <div class="hmi-equals">=</div>
@@ -598,18 +672,23 @@
             </div>
         </div>
 
-        <!-- ASISTENTE DE OFFSET Y DESGLOSE PARA MEZCLADORA 1 -->
+        <!-- CALCULADORA DE OFFSET POR BRIX DE BEBIDA DESEADO -->
         <div class="helper-card">
-            <div class="helper-title">Ajuste rápido de Offset para Mezcladora 1:</div>
-            <div class="preset-btns">
-                <button class="preset-btn" onclick="aplicarOffsetObjetivo(1, 10.37)">
-                    Clavar en 10,37 °Bx
-                    <span id="m1-rec-1037">-0,029</span>
-                </button>
-                <button class="preset-btn" onclick="aplicarOffsetObjetivo(1, 10.50)">
-                    Clavar en 10,50 °Bx
-                    <span id="m1-rec-1050">-0,013</span>
-                </button>
+            <div class="helper-title">Calcular Offset para el Brix de bebida que quieras:</div>
+            <div class="quick-pills">
+                <button class="pill-btn" onclick="setObjetivoDeseado(1, 10.37)">Obj: 10,37 °Bx</button>
+                <button class="pill-btn" onclick="setObjetivoDeseado(1, 10.50)">Obj: 10,50 °Bx</button>
+            </div>
+            <div class="target-solver-grid">
+                <div class="target-input-box">
+                    <label for="m1-brix-deseado">Brix bebida deseado (°Bx):</label>
+                    <input type="text" id="m1-brix-deseado" inputmode="decimal" value="10,37" oninput="calcularMezcladora(1)">
+                </div>
+                <div class="target-result-box">
+                    <div class="target-result-label">Offset correcto a poner:</div>
+                    <div class="target-result-value" id="m1-offset-sugerido">-0,028</div>
+                    <button class="apply-btn" onclick="aplicarOffsetCalculado(1)">Aplicar en pantalla</button>
+                </div>
             </div>
             <div class="helper-info" id="m1-resumen"></div>
             <button class="reset-link" onclick="resetMezcladora(1)">Restaurar valores de la foto (Mezcladora 1)</button>
@@ -634,6 +713,13 @@
                     <label for="m2-desfase">Desfase Medidor (°Bx):</label>
                     <input type="text" id="m2-desfase" inputmode="decimal" value="0,00" oninput="onDesfaseInput(2)">
                 </div>
+                <div class="syrup-field" style="grid-column: span 2;">
+                    <label for="m2-modo">Al cambiar el Brix real del jarabe:</label>
+                    <select id="m2-modo" onchange="calcularMezcladora(2)">
+                        <option value="directo" selected>Variar Brix final de bebida (mantener dosificación actual)</option>
+                        <option value="auto">Lazo automático PLC (corregir componente y mantener bebida)</option>
+                    </select>
+                </div>
             </div>
         </div>
 
@@ -654,7 +740,7 @@
                     <div class="hmi-box" style="margin-top: 14px;">
                         <div class="hmi-box-title">Valor nominal Brix del jarabe</div>
                         <div class="hmi-input-wrap">
-                            <input type="text" id="m2-jarabe-nom" inputmode="decimal" value="55,30" oninput="calcularMezcladora(2)">
+                            <input type="text" id="m2-jarabe-nom" inputmode="decimal" value="55,30" oninput="onHmiParamInput(2)">
                             <span class="hmi-unit">°Brix</span>
                         </div>
                     </div>
@@ -663,14 +749,14 @@
                         <div class="hmi-box" style="margin-bottom: 6px;">
                             <div class="hmi-box-title">Valor nominal Brix del producto</div>
                             <div class="hmi-input-wrap">
-                                <input type="text" id="m2-prod-nom" inputmode="decimal" value="10,37" oninput="calcularMezcladora(2)">
+                                <input type="text" id="m2-prod-nom" inputmode="decimal" value="10,37" oninput="onHmiParamInput(2)">
                                 <span class="hmi-unit">°Brix</span>
                             </div>
                         </div>
                         <div class="hmi-box">
                             <div class="hmi-box-title">Valor nominal Brix del offset de producto</div>
                             <div class="hmi-input-wrap">
-                                <input type="text" id="m2-prod-offset" inputmode="decimal" value="0,00" oninput="calcularMezcladora(2)">
+                                <input type="text" id="m2-prod-offset" inputmode="decimal" value="0,00" oninput="onHmiParamInput(2)">
                                 <span class="hmi-unit">°Brix</span>
                             </div>
                         </div>
@@ -711,7 +797,7 @@
                     <div class="hmi-box">
                         <div class="hmi-box-title">Proporción de agua</div>
                         <div class="hmi-input-wrap">
-                            <input type="text" id="m2-agua" inputmode="decimal" value="5,400" oninput="calcularMezcladora(2)">
+                            <input type="text" id="m2-agua" inputmode="decimal" value="5,400" oninput="onHmiParamInput(2)">
                         </div>
                     </div>
 
@@ -719,7 +805,7 @@
                         <div class="hmi-box">
                             <div class="hmi-box-title">Valor nominal offset</div>
                             <div class="hmi-input-wrap">
-                                <input type="text" id="m2-offset-nom" inputmode="decimal" value="0,004" oninput="calcularMezcladora(2)">
+                                <input type="text" id="m2-offset-nom" inputmode="decimal" value="0,004" oninput="onHmiParamInput(2)">
                             </div>
                         </div>
                         <div class="hmi-equals">=</div>
@@ -741,18 +827,23 @@
             </div>
         </div>
 
-        <!-- ASISTENTE DE OFFSET Y DESGLOSE PARA MEZCLADORA 2 -->
+        <!-- CALCULADORA DE OFFSET POR BRIX DE BEBIDA DESEADO -->
         <div class="helper-card">
-            <div class="helper-title">Ajuste rápido de Offset para Mezcladora 2:</div>
-            <div class="preset-btns">
-                <button class="preset-btn" onclick="aplicarOffsetObjetivo(2, 10.37)">
-                    Clavar en 10,37 °Bx
-                    <span id="m2-rec-1037">0,000</span>
-                </button>
-                <button class="preset-btn" onclick="aplicarOffsetObjetivo(2, 10.50)">
-                    Clavar en 10,50 °Bx
-                    <span id="m2-rec-1050">+0,015</span>
-                </button>
+            <div class="helper-title">Calcular Offset para el Brix de bebida que quieras:</div>
+            <div class="quick-pills">
+                <button class="pill-btn" onclick="setObjetivoDeseado(2, 10.37)">Obj: 10,37 °Bx</button>
+                <button class="pill-btn" onclick="setObjetivoDeseado(2, 10.50)">Obj: 10,50 °Bx</button>
+            </div>
+            <div class="target-solver-grid">
+                <div class="target-input-box">
+                    <label for="m2-brix-deseado">Brix bebida deseado (°Bx):</label>
+                    <input type="text" id="m2-brix-deseado" inputmode="decimal" value="10,37" oninput="calcularMezcladora(2)">
+                </div>
+                <div class="target-result-box">
+                    <div class="target-result-label">Offset correcto a poner:</div>
+                    <div class="target-result-value" id="m2-offset-sugerido">0,000</div>
+                    <button class="apply-btn" onclick="aplicarOffsetCalculado(2)">Aplicar en pantalla</button>
+                </div>
             </div>
             <div class="helper-info" id="m2-resumen"></div>
             <button class="reset-link" onclick="resetMezcladora(2)">Restaurar valores de la foto (Mezcladora 2)</button>
@@ -824,6 +915,10 @@
     </div>
 
     <script>
+        // Guarda el componente actual de cada mezcladora para poder simular el impacto directo del jarabe
+        const componenteActual = { 1: null, 2: null };
+        const ultimoOffsetCalculado = { 1: 0, 2: 0 };
+
         function parseNum(val) {
             if (val === null || val === undefined || val === '') return 0;
             const cleaned = String(val).replace(',', '.').trim();
@@ -859,6 +954,12 @@
             return 0.9982 + 0.003855 * brix + 0.0000159 * brix * brix;
         }
 
+        /* CUANDO EL USUARIO CAMBIA PARÁMETROS EN LA PANTALLA HMI */
+        function onHmiParamInput(m) {
+            componenteActual[m] = null; // Fuerza a recalcular el componente con los nuevos datos de la pantalla
+            calcularMezcladora(m);
+        }
+
         /* SINCRONIZACIÓN JARABE REAL <-> LECTOR SENSOR */
         function onLabJarabeInput(m) {
             const jarabeLab = parseNum(document.getElementById(`m${m}-jarabe-lab`).value);
@@ -867,11 +968,21 @@
                 const lecturaSensor = jarabeLab + desfase;
                 document.getElementById(`m${m}-jarabe-sensor`).value = fmt(lecturaSensor, 2);
             }
+            // Si está en modo "auto", dejamos que el componente se recalcule; si está en "directo", conservamos el componente actual
+            if (document.getElementById(`m${m}-modo`).value === 'auto') {
+                componenteActual[m] = null;
+            }
             calcularMezcladora(m);
         }
 
         function onDesfaseInput(m) {
-            onLabJarabeInput(m);
+            const jarabeLab = parseNum(document.getElementById(`m${m}-jarabe-lab`).value);
+            const desfase = parseNum(document.getElementById(`m${m}-desfase`).value);
+            if (jarabeLab > 0) {
+                document.getElementById(`m${m}-jarabe-sensor`).value = fmt(jarabeLab + desfase, 2);
+            }
+            componenteActual[m] = null;
+            calcularMezcladora(m);
         }
 
         function onSensorJarabeInput(m) {
@@ -881,10 +992,13 @@
                 const jarabeLab = lecturaSensor - desfase;
                 document.getElementById(`m${m}-jarabe-lab`).value = fmt(jarabeLab, 2);
             }
+            if (document.getElementById(`m${m}-modo`).value === 'auto') {
+                componenteActual[m] = null;
+            }
             calcularMezcladora(m);
         }
 
-        /* CÁLCULO DEL LAZO DE CONTROL KRONES (DO01) CON DESGLOSE IZQ VS DER */
+        /* CÁLCULO DEL LAZO DE CONTROL KRONES (DO01) */
         function calcularMezcladora(m) {
             const jarabeNom = parseNum(document.getElementById(`m${m}-jarabe-nom`).value);
             const jarabeLab = parseNum(document.getElementById(`m${m}-jarabe-lab`).value);
@@ -893,6 +1007,8 @@
             const prodOffset = parseNum(document.getElementById(`m${m}-prod-offset`).value);
             const propAgua = parseNum(document.getElementById(`m${m}-agua`).value);
             const offsetNom = parseNum(document.getElementById(`m${m}-offset-nom`).value);
+            const modo = document.getElementById(`m${m}-modo`).value;
+            const brixDeseado = parseNum(document.getElementById(`m${m}-brix-deseado`).value);
 
             const brixObjPLC = prodNom + prodOffset;
 
@@ -906,7 +1022,7 @@
             const densNom = densidadJarabe(jarabeNom);
             const ratioReceta = (densNom / 0.9982) * ((jarabeNom / brixObjPLC) - 1);
 
-            // 2. Ratio requerido con el jarabe REAL leído por el sensor (arriba derecha)
+            // 2. Ratio requerido con el jarabe leído por el sensor (arriba derecha)
             const densSensor = densidadJarabe(jarabeSensor);
             const ratioSensorPLC = (densSensor / 0.9982) * ((jarabeSensor / brixObjPLC) - 1);
 
@@ -915,10 +1031,13 @@
             const ajusteJarabe = (propAgua / ratioSensorPLC) - (propAgua / ratioReceta);
             const factorBasePLC = 1 + ajusteProducto + ajusteJarabe;
 
-            // 4. Valor nominal del componente = Factor base + Valor nominal offset
-            const componente = factorBasePLC + offsetNom;
+            // 4. Valor nominal del componente
+            if (componenteActual[m] === null || modo === 'auto') {
+                componenteActual[m] = factorBasePLC + offsetNom;
+            }
+            const componente = componenteActual[m];
 
-            // 5. Brix real del producto terminado usando el JARABE REAL (laboratorio)
+            // 5. Brix real del producto terminado usando el JARABE REAL (laboratorio) y el componente actual
             const ratioRealAgua = propAgua / componente;
             const densReal = densidadJarabe(jarabeLab);
             const prodReal = (densReal * jarabeLab) / (densReal + ratioRealAgua * 0.9982);
@@ -928,24 +1047,27 @@
             const prodEl = document.getElementById(`m${m}-prod-real`);
             prodEl.innerText = fmt(prodReal, 2) + ' °Brix';
 
-            if (Math.abs(prodReal - brixObjPLC) <= 0.05) {
+            if (Math.abs(prodReal - brixDeseado) <= 0.04) {
                 prodEl.className = 'hmi-output-val prod-status-good';
             } else {
                 prodEl.className = 'hmi-output-val prod-status-bad';
             }
 
-            // 6. Calcular offsets recomendados para 10,37 y 10,50
-            const off1037 = calcularOffsetParaObjetivo(jarabeLab, propAgua, factorBasePLC, 10.37);
-            const off1050 = calcularOffsetParaObjetivo(jarabeLab, propAgua, factorBasePLC, 10.50);
+            // 6. Calcular el offset exacto necesario para el Brix deseado por el usuario
+            if (brixDeseado > 0 && jarabeLab > brixDeseado) {
+                const offsetCalc = calcularOffsetParaObjetivo(jarabeLab, propAgua, factorBasePLC, brixDeseado);
+                ultimoOffsetCalculado[m] = offsetCalc;
+                document.getElementById(`m${m}-offset-sugerido`).innerText = fmtSigned(offsetCalc, 3);
+            } else {
+                document.getElementById(`m${m}-offset-sugerido`).innerText = '---';
+            }
 
-            document.getElementById(`m${m}-rec-1037`).innerText = fmtSigned(off1037, 3);
-            document.getElementById(`m${m}-rec-1050`).innerText = fmtSigned(off1050, 3);
-
-            // 7. Resumen con desglose Izquierda vs Derecha
+            // 7. Resumen informativo
+            const componenteAuto = factorBasePLC + offsetNom;
             const resumenEl = document.getElementById(`m${m}-resumen`);
             resumenEl.innerHTML =
-                `<strong>Círculo PLC (${fmt(factorBasePLC, 3)}):</strong> 1,000 ${fmtSigned(ajusteJarabe, 3)} ${fmtSigned(ajusteProducto, 3)}<br>` +
-                `Bebida real resultante: <strong>${fmt(prodReal, 2)} °Brix</strong> (relación 1 : ${fmt(ratioRealAgua, 2)}).` +
+                `<strong>Bebida actual:</strong> <strong>${fmt(prodReal, 2)} °Brix</strong> (relación 1 : ${fmt(ratioRealAgua, 2)}).<br>` +
+                `<strong>Círculo PLC (${fmt(factorBasePLC, 3)}):</strong> si el PLC autoajusta con offset ${fmtSigned(offsetNom, 3)}, pondrá componente <strong>${fmt(componenteAuto, 3)}</strong>.` +
                 `<div class="breakdown-grid">` +
                 `<div><strong>Izq vs. Der:</strong> ${fmtSigned(ajusteJarabe, 3)}<br><small>(${fmt(jarabeNom, 2)} vs ${fmt(jarabeSensor, 2)})</small></div>` +
                 `<div><strong>Centro vs. Receta:</strong> ${fmtSigned(ajusteProducto, 3)}<br><small>(Obj ${fmt(brixObjPLC, 2)} °Bx)</small></div>` +
@@ -959,42 +1081,42 @@
             return componenteDeseado - factorBasePLC;
         }
 
-        function aplicarOffsetObjetivo(m, objetivoBrix) {
-            const jarabeSensor = parseNum(document.getElementById(`m${m}-jarabe-sensor`).value);
-            const jarabeLab = parseNum(document.getElementById(`m${m}-jarabe-lab`).value);
-            const prodNom = parseNum(document.getElementById(`m${m}-prod-nom`).value);
-            const prodOffset = parseNum(document.getElementById(`m${m}-prod-offset`).value);
-            const propAgua = parseNum(document.getElementById(`m${m}-agua`).value);
-            const brixObjPLC = prodNom + prodOffset;
+        function setObjetivoDeseado(m, valor) {
+            document.getElementById(`m${m}-brix-deseado`).value = fmt(valor, 2);
+            calcularMezcladora(m);
+        }
 
-            const densSensor = densidadJarabe(jarabeSensor);
-            const ratioSensorPLC = (densSensor / 0.9982) * ((jarabeSensor / brixObjPLC) - 1);
-            const factorBasePLC = propAgua / ratioSensorPLC;
-
-            const nuevoOffset = calcularOffsetParaObjetivo(jarabeLab, propAgua, factorBasePLC, objetivoBrix);
+        function aplicarOffsetCalculado(m) {
+            const nuevoOffset = ultimoOffsetCalculado[m];
             document.getElementById(`m${m}-offset-nom`).value = fmt(nuevoOffset, 3);
+            componenteActual[m] = null; // Recalcula el componente con el nuevo offset aplicado
             calcularMezcladora(m);
         }
 
         function resetMezcladora(m) {
+            componenteActual[m] = null;
             if (m === 1) {
                 document.getElementById('m1-jarabe-lab').value = '54,80';
                 document.getElementById('m1-desfase').value = '-0,46';
+                document.getElementById('m1-modo').value = 'directo';
                 document.getElementById('m1-jarabe-nom').value = '54,80';
                 document.getElementById('m1-prod-nom').value = '10,50';
                 document.getElementById('m1-prod-offset').value = '0,00';
                 document.getElementById('m1-jarabe-sensor').value = '54,34';
                 document.getElementById('m1-agua').value = '5,400';
                 document.getElementById('m1-offset-nom').value = '-0,030';
+                document.getElementById('m1-brix-deseado').value = '10,37';
             } else {
                 document.getElementById('m2-jarabe-lab').value = '54,89';
                 document.getElementById('m2-desfase').value = '0,00';
+                document.getElementById('m2-modo').value = 'directo';
                 document.getElementById('m2-jarabe-nom').value = '55,30';
                 document.getElementById('m2-prod-nom').value = '10,37';
                 document.getElementById('m2-prod-offset').value = '0,00';
                 document.getElementById('m2-jarabe-sensor').value = '54,89';
                 document.getElementById('m2-agua').value = '5,400';
                 document.getElementById('m2-offset-nom').value = '0,004';
+                document.getElementById('m2-brix-deseado').value = '10,37';
             }
             calcularMezcladora(m);
         }
