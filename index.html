@@ -148,19 +148,19 @@
             margin-bottom: 3px;
         }
 
-        .syrup-field input, .syrup-field select {
+        .syrup-field input {
             width: 100%;
             padding: 8px;
             border: 1.5px solid #cbd5e1;
             border-radius: 7px;
-            font-size: 15px;
+            font-size: 16px;
             font-weight: 700;
             text-align: center;
             background: #f8fafc;
             color: #0f172a;
         }
 
-        .syrup-field input:focus, .syrup-field select:focus {
+        .syrup-field input:focus {
             outline: none;
             border-color: #2563eb;
             background: #fff;
@@ -471,16 +471,6 @@
             line-height: 1.4;
         }
 
-        .breakdown-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 6px;
-            margin-top: 6px;
-            padding-top: 6px;
-            border-top: 1px dashed #cbd5e1;
-            font-size: 0.94em;
-        }
-
         .reset-link {
             display: block;
             width: 100%;
@@ -556,13 +546,6 @@
                 <div class="syrup-field">
                     <label for="m1-desfase">Desfase B136.FIT (°Bx):</label>
                     <input type="text" id="m1-desfase" inputmode="decimal" value="-0,46" oninput="onDesfaseInput(1)">
-                </div>
-                <div class="syrup-field" style="grid-column: span 2;">
-                    <label for="m1-modo">Al cambiar el Brix real del jarabe:</label>
-                    <select id="m1-modo" onchange="calcularMezcladora(1)">
-                        <option value="directo" selected>Variar Brix final de bebida (mantener dosificación actual)</option>
-                        <option value="auto">Lazo automático PLC (corregir componente y mantener bebida)</option>
-                    </select>
                 </div>
             </div>
         </div>
@@ -712,13 +695,6 @@
                 <div class="syrup-field">
                     <label for="m2-desfase">Desfase Medidor (°Bx):</label>
                     <input type="text" id="m2-desfase" inputmode="decimal" value="0,00" oninput="onDesfaseInput(2)">
-                </div>
-                <div class="syrup-field" style="grid-column: span 2;">
-                    <label for="m2-modo">Al cambiar el Brix real del jarabe:</label>
-                    <select id="m2-modo" onchange="calcularMezcladora(2)">
-                        <option value="directo" selected>Variar Brix final de bebida (mantener dosificación actual)</option>
-                        <option value="auto">Lazo automático PLC (corregir componente y mantener bebida)</option>
-                    </select>
                 </div>
             </div>
         </div>
@@ -915,7 +891,6 @@
     </div>
 
     <script>
-        // Guarda el componente actual de cada mezcladora para poder simular el impacto directo del jarabe
         const componenteActual = { 1: null, 2: null };
         const ultimoOffsetCalculado = { 1: 0, 2: 0 };
 
@@ -954,23 +929,18 @@
             return 0.9982 + 0.003855 * brix + 0.0000159 * brix * brix;
         }
 
-        /* CUANDO EL USUARIO CAMBIA PARÁMETROS EN LA PANTALLA HMI */
+        /* CUANDO SE CAMBIA OFFSET, AGUA O CONSIGNAS EN LA PANTALLA */
         function onHmiParamInput(m) {
-            componenteActual[m] = null; // Fuerza a recalcular el componente con los nuevos datos de la pantalla
+            componenteActual[m] = null;
             calcularMezcladora(m);
         }
 
-        /* SINCRONIZACIÓN JARABE REAL <-> LECTOR SENSOR */
+        /* CUANDO SE CAMBIA EL BRIX REAL DEL JARABE -> ACTUALIZA SENSOR Y BRIX FINAL DE BEBIDA */
         function onLabJarabeInput(m) {
             const jarabeLab = parseNum(document.getElementById(`m${m}-jarabe-lab`).value);
             const desfase = parseNum(document.getElementById(`m${m}-desfase`).value);
             if (jarabeLab > 0) {
-                const lecturaSensor = jarabeLab + desfase;
-                document.getElementById(`m${m}-jarabe-sensor`).value = fmt(lecturaSensor, 2);
-            }
-            // Si está en modo "auto", dejamos que el componente se recalcule; si está en "directo", conservamos el componente actual
-            if (document.getElementById(`m${m}-modo`).value === 'auto') {
-                componenteActual[m] = null;
+                document.getElementById(`m${m}-jarabe-sensor`).value = fmt(jarabeLab + desfase, 2);
             }
             calcularMezcladora(m);
         }
@@ -989,60 +959,45 @@
             const lecturaSensor = parseNum(document.getElementById(`m${m}-jarabe-sensor`).value);
             const desfase = parseNum(document.getElementById(`m${m}-desfase`).value);
             if (lecturaSensor > 0) {
-                const jarabeLab = lecturaSensor - desfase;
-                document.getElementById(`m${m}-jarabe-lab`).value = fmt(jarabeLab, 2);
-            }
-            if (document.getElementById(`m${m}-modo`).value === 'auto') {
-                componenteActual[m] = null;
+                document.getElementById(`m${m}-jarabe-lab`).value = fmt(lecturaSensor - desfase, 2);
             }
             calcularMezcladora(m);
         }
 
-        /* CÁLCULO DEL LAZO DE CONTROL KRONES (DO01) */
+        /* CÁLCULO PRINCIPAL */
         function calcularMezcladora(m) {
-            const jarabeNom = parseNum(document.getElementById(`m${m}-jarabe-nom`).value);
             const jarabeLab = parseNum(document.getElementById(`m${m}-jarabe-lab`).value);
             const jarabeSensor = parseNum(document.getElementById(`m${m}-jarabe-sensor`).value);
             const prodNom = parseNum(document.getElementById(`m${m}-prod-nom`).value);
             const prodOffset = parseNum(document.getElementById(`m${m}-prod-offset`).value);
             const propAgua = parseNum(document.getElementById(`m${m}-agua`).value);
             const offsetNom = parseNum(document.getElementById(`m${m}-offset-nom`).value);
-            const modo = document.getElementById(`m${m}-modo`).value;
             const brixDeseado = parseNum(document.getElementById(`m${m}-brix-deseado`).value);
 
             const brixObjPLC = prodNom + prodOffset;
 
-            if (jarabeSensor <= brixObjPLC || jarabeNom <= brixObjPLC || brixObjPLC <= 0 || propAgua <= 0 || jarabeLab <= 0) {
+            if (jarabeSensor <= brixObjPLC || brixObjPLC <= 0 || propAgua <= 0 || jarabeLab <= 0) {
                 document.getElementById(`m${m}-componente`).innerText = '---';
                 document.getElementById(`m${m}-prod-real`).innerText = '---';
                 return;
             }
 
-            // 1. Ratio requerido con el jarabe NOMINAL (arriba izquierda)
-            const densNom = densidadJarabe(jarabeNom);
-            const ratioReceta = (densNom / 0.9982) * ((jarabeNom / brixObjPLC) - 1);
-
-            // 2. Ratio requerido con el jarabe leído por el sensor (arriba derecha)
+            // 1. Factor base calculado por el PLC según lo que lee su sensor de jarabe
             const densSensor = densidadJarabe(jarabeSensor);
             const ratioSensorPLC = (densSensor / 0.9982) * ((jarabeSensor / brixObjPLC) - 1);
+            const factorBasePLC = propAgua / ratioSensorPLC;
 
-            // 3. Desglose de los dos ajustes dentro del círculo central:
-            const ajusteProducto = (propAgua / ratioReceta) - 1;
-            const ajusteJarabe = (propAgua / ratioSensorPLC) - (propAgua / ratioReceta);
-            const factorBasePLC = 1 + ajusteProducto + ajusteJarabe;
-
-            // 4. Valor nominal del componente
-            if (componenteActual[m] === null || modo === 'auto') {
+            // 2. Si se acaba de abrir o se tocó el offset/agua, actualizamos el componente con el offset puesto
+            if (componenteActual[m] === null) {
                 componenteActual[m] = factorBasePLC + offsetNom;
             }
             const componente = componenteActual[m];
 
-            // 5. Brix real del producto terminado usando el JARABE REAL (laboratorio) y el componente actual
+            // 3. Brix real del producto terminado con el jarabe real y el componente actual
             const ratioRealAgua = propAgua / componente;
             const densReal = densidadJarabe(jarabeLab);
             const prodReal = (densReal * jarabeLab) / (densReal + ratioRealAgua * 0.9982);
 
-            // Actualizar casillas HMI
             document.getElementById(`m${m}-componente`).innerText = fmt(componente, 3);
             const prodEl = document.getElementById(`m${m}-prod-real`);
             prodEl.innerText = fmt(prodReal, 2) + ' °Brix';
@@ -1053,7 +1008,7 @@
                 prodEl.className = 'hmi-output-val prod-status-bad';
             }
 
-            // 6. Calcular el offset exacto necesario para el Brix deseado por el usuario
+            // 4. Calcular el offset exacto necesario para el Brix de bebida deseado
             if (brixDeseado > 0 && jarabeLab > brixDeseado) {
                 const offsetCalc = calcularOffsetParaObjetivo(jarabeLab, propAgua, factorBasePLC, brixDeseado);
                 ultimoOffsetCalculado[m] = offsetCalc;
@@ -1062,16 +1017,11 @@
                 document.getElementById(`m${m}-offset-sugerido`).innerText = '---';
             }
 
-            // 7. Resumen informativo
-            const componenteAuto = factorBasePLC + offsetNom;
+            // 5. Resumen claro
             const resumenEl = document.getElementById(`m${m}-resumen`);
             resumenEl.innerHTML =
-                `<strong>Bebida actual:</strong> <strong>${fmt(prodReal, 2)} °Brix</strong> (relación 1 : ${fmt(ratioRealAgua, 2)}).<br>` +
-                `<strong>Círculo PLC (${fmt(factorBasePLC, 3)}):</strong> si el PLC autoajusta con offset ${fmtSigned(offsetNom, 3)}, pondrá componente <strong>${fmt(componenteAuto, 3)}</strong>.` +
-                `<div class="breakdown-grid">` +
-                `<div><strong>Izq vs. Der:</strong> ${fmtSigned(ajusteJarabe, 3)}<br><small>(${fmt(jarabeNom, 2)} vs ${fmt(jarabeSensor, 2)})</small></div>` +
-                `<div><strong>Centro vs. Receta:</strong> ${fmtSigned(ajusteProducto, 3)}<br><small>(Obj ${fmt(brixObjPLC, 2)} °Bx)</small></div>` +
-                `</div>`;
+                `Con jarabe real a <strong>${fmt(jarabeLab, 2)} °Brix</strong> (sensor lee <strong>${fmt(jarabeSensor, 2)} °Bx</strong>) y componente <strong>${fmt(componente, 3)}</strong>:<br>` +
+                `La bebida sale a <strong>${fmt(prodReal, 2)} °Brix</strong> (relación 1 : ${fmt(ratioRealAgua, 2)}).`;
         }
 
         function calcularOffsetParaObjetivo(jarabeLab, propAgua, factorBasePLC, objetivoBrix) {
@@ -1089,7 +1039,7 @@
         function aplicarOffsetCalculado(m) {
             const nuevoOffset = ultimoOffsetCalculado[m];
             document.getElementById(`m${m}-offset-nom`).value = fmt(nuevoOffset, 3);
-            componenteActual[m] = null; // Recalcula el componente con el nuevo offset aplicado
+            componenteActual[m] = null;
             calcularMezcladora(m);
         }
 
@@ -1098,7 +1048,6 @@
             if (m === 1) {
                 document.getElementById('m1-jarabe-lab').value = '54,80';
                 document.getElementById('m1-desfase').value = '-0,46';
-                document.getElementById('m1-modo').value = 'directo';
                 document.getElementById('m1-jarabe-nom').value = '54,80';
                 document.getElementById('m1-prod-nom').value = '10,50';
                 document.getElementById('m1-prod-offset').value = '0,00';
@@ -1109,7 +1058,6 @@
             } else {
                 document.getElementById('m2-jarabe-lab').value = '54,89';
                 document.getElementById('m2-desfase').value = '0,00';
-                document.getElementById('m2-modo').value = 'directo';
                 document.getElementById('m2-jarabe-nom').value = '55,30';
                 document.getElementById('m2-prod-nom').value = '10,37';
                 document.getElementById('m2-prod-offset').value = '0,00';
