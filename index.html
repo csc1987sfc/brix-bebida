@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Control Planta - BRIX y Mezcladoras</title>
+    <title>Control Planta - L21 / L22 / L20</title>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#1e3a5f">
@@ -50,8 +50,8 @@
             border: none;
             border-radius: 9px;
             padding: 9px 4px;
-            font-size: 0.76em;
-            font-weight: 700;
+            font-size: 0.8em;
+            font-weight: 800;
             cursor: pointer;
             background: #cbd2dc;
             color: #334155;
@@ -63,8 +63,8 @@
         .nav-btn small {
             display: block;
             font-weight: 500;
-            font-size: 0.82em;
-            opacity: 0.9;
+            font-size: 0.78em;
+            opacity: 0.92;
             margin-top: 2px;
         }
 
@@ -119,6 +119,7 @@
         }
 
         .badge-warn { background: #fee2e2; color: #991b1b; }
+        .badge-info { background: #dbeafe; color: #1e40af; }
         .badge-ok { background: #dcfce7; color: #166534; }
 
         .two-inputs {
@@ -492,6 +493,85 @@
         .good { color: #2e7d32; }
         .bad { color: #c62828; }
         .note { font-size: 0.78em; color: #777; font-style: italic; margin-top: 8px; }
+
+        /* GUÍA DE INSTRUCCIONES Y ALERTA EN CORRECCIÓN TANQUE */
+        .tank-guide {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-left: 4px solid #1565c0;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 12px;
+            font-size: 0.8em;
+            color: #1e293b;
+            line-height: 1.4;
+        }
+        .tank-guide-title {
+            font-weight: 800;
+            color: #1e3a8a;
+            margin-bottom: 5px;
+        }
+        .tank-guide ul {
+            margin: 4px 0 0 0;
+            padding-left: 16px;
+        }
+        .tank-guide li {
+            margin-bottom: 4px;
+        }
+        .scale-warning {
+            display: none;
+            background: #fff7ed;
+            border: 1.5px solid #f97316;
+            color: #9a3412;
+            border-radius: 8px;
+            padding: 8px 10px;
+            font-size: 0.8em;
+            font-weight: 700;
+            margin-bottom: 10px;
+            line-height: 1.35;
+        }
+
+        /* BOTONES DE TRANSFERENCIA DESDE ANALIZADOR DE INVERSIÓN */
+        .transfer-btn {
+            width: 100%;
+            margin-top: 10px;
+            background: #6a1b9a;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 9px;
+            font-size: 0.84em;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .transfer-btn:active { background: #4a148c; }
+        .send-lines-wrap {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px dashed #d8b4fe;
+        }
+        .send-lines-label {
+            font-size: 0.76em;
+            font-weight: 700;
+            color: #581c87;
+            margin-bottom: 5px;
+        }
+        .send-lines-btns {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+        }
+        .send-line-btn {
+            background: #f3e8ff;
+            border: 1px solid #c084fc;
+            color: #581c87;
+            border-radius: 6px;
+            padding: 6px 4px;
+            font-size: 0.78em;
+            font-weight: 800;
+            cursor: pointer;
+        }
+        .send-line-btn:active { background: #e9d5ff; }
     </style>
 </head>
 <body>
@@ -499,16 +579,16 @@
     <!-- SELECTOR DE 3 MEZCLADORAS + LAB -->
     <div class="nav-tabs">
         <button class="nav-btn active-m1" id="tab-m1" onclick="switchTab('m1')">
-            Mezcl. 1
-            <small>Sensor -0,46</small>
+            L21
+            <small id="tab-sub-m1">Sensor -0,40</small>
         </button>
         <button class="nav-btn" id="tab-m2" onclick="switchTab('m2')">
-            Mezcl. 2
-            <small>MR-03</small>
+            L22
+            <small id="tab-sub-m2">Caud. +0,005</small>
         </button>
         <button class="nav-btn" id="tab-m3" onclick="switchTab('m3')">
-            Mezcl. 3
-            <small>L20 / L22</small>
+            L20
+            <small id="tab-sub-m3">Sensor OK</small>
         </button>
         <button class="nav-btn" id="tab-lab" onclick="switchTab('lab')">
             Lab / 800L
@@ -517,18 +597,18 @@
     </div>
 
     <!-- ========================================================= -->
-    <!-- VISTA 1: MEZCLADORA 1 (MEDIDOR B136.FIT CON -0,46 °BRIX)  -->
+    <!-- VISTA 1: L21 (MEDIDOR B136.FIT CON DESFASE -0,40 °BRIX)   -->
     <!-- ========================================================= -->
     <div id="view-m1" class="view-section active">
         <div class="input-card">
             <div class="card-header">
-                <span class="card-title">Mezcladora 1 — Introduce solo 2 datos</span>
-                <span class="badge-sensor badge-warn">Sensor: -0,46 °Bx</span>
+                <span class="card-title">L21 — Introduce solo 2 datos</span>
+                <span class="badge-sensor badge-warn" id="m1-badge">Sensor: -0,40 °Bx</span>
             </div>
             <div class="two-inputs">
                 <div class="field-box">
                     <label for="m1-jarabe-lab">1. Brix REAL jarabe:</label>
-                    <input type="text" id="m1-jarabe-lab" inputmode="decimal" value="54,90" oninput="recalcularAuto(1)">
+                    <input type="text" id="m1-jarabe-lab" inputmode="decimal" value="54,83" oninput="recalcularAuto(1)">
                 </div>
                 <div class="field-box">
                     <label for="m1-brix-deseado">2. Brix bebida (inversión):</label>
@@ -542,16 +622,16 @@
             <div class="offset-banner">
                 <div class="offset-banner-label">
                     PONER EN VALOR NOMINAL OFFSET:
-                    <small>B136.FIT leerá <span id="m1-banner-sensor">54,44</span> °Brix</small>
+                    <small>B136.FIT leerá <span id="m1-banner-sensor">54,43</span> °Brix</small>
                 </div>
-                <div class="offset-banner-value" id="m1-banner-offset">-0,028</div>
+                <div class="offset-banner-value" id="m1-banner-offset">-0,027</div>
             </div>
         </div>
 
-        <!-- PANTALLA KRONES HMI - MEZCLADORA 1 (NOMINALES FIJOS COMO EN FOTO) -->
+        <!-- PANTALLA KRONES HMI - L21 -->
         <div class="hmi-panel">
             <div class="hmi-top-bar">
-                <span>Valor Brix (Mezcladora 1)</span>
+                <span>Valor Brix (L21)</span>
                 <span>DO01</span>
             </div>
             <div class="hmi-subtabs">
@@ -581,7 +661,7 @@
                         <div class="sensor-tag">B136.FIT</div>
                         <div class="hmi-box">
                             <div class="hmi-box-title">Valor real Brix jarabe</div>
-                            <div class="hmi-val-box sensor-val" id="m1-jarabe-sensor">54,44 °Brix</div>
+                            <div class="hmi-val-box sensor-val" id="m1-jarabe-sensor">54,43 °Brix</div>
                         </div>
                     </div>
                 </div>
@@ -614,13 +694,13 @@
                         <div class="hmi-box offset-highlight-box">
                             <div class="hmi-box-title">Valor nominal offset</div>
                             <div class="hmi-val-box editable-offset">
-                                <input type="text" id="m1-offset-nom" inputmode="decimal" value="-0,028" oninput="recalcularConOffsetManual(1)">
+                                <input type="text" id="m1-offset-nom" inputmode="decimal" value="-0,027" oninput="recalcularConOffsetManual(1)">
                             </div>
                         </div>
                         <div class="hmi-equals">=</div>
                         <div class="hmi-box">
                             <div class="hmi-box-title">Valor nominal del componente</div>
-                            <div class="hmi-val-box" id="m1-componente">0,998</div>
+                            <div class="hmi-val-box" id="m1-componente">1,000</div>
                         </div>
                     </div>
 
@@ -635,30 +715,30 @@
         <div class="footer-card">
             <div class="resumen-text" id="m1-resumen"></div>
             <details class="adv-settings">
-                <summary>Ajuste de sensor / caudalímetro (solo si calibran máquina)</summary>
+                <summary>Ajuste de sensor / caudalímetro (se guarda solo en el móvil)</summary>
                 <div class="adv-grid">
                     <div class="adv-field">
                         <label for="m1-desfase">Desfase B136.FIT (°Bx):</label>
-                        <input type="text" id="m1-desfase" inputmode="decimal" value="-0,46" oninput="recalcularAuto(1)">
+                        <input type="text" id="m1-desfase" inputmode="decimal" value="-0,40" oninput="onCalibracionChange(1)">
                     </div>
                     <div class="adv-field">
                         <label for="m1-trim">Ajuste extra caudalímetro:</label>
-                        <input type="text" id="m1-trim" inputmode="decimal" value="0,000" oninput="recalcularAuto(1)">
+                        <input type="text" id="m1-trim" inputmode="decimal" value="0,000" oninput="onCalibracionChange(1)">
                     </div>
                 </div>
-                <button class="reset-link" onclick="resetMezcladora(1)">Restaurar datos por defecto (Mezcladora 1)</button>
+                <button class="reset-link" onclick="resetMezcladora(1)">Restaurar datos por defecto (L21)</button>
             </details>
         </div>
     </div>
 
     <!-- ========================================================= -->
-    <!-- VISTA 2: MEZCLADORA 2 (MR-03, SENSOR CALIBRADO)           -->
+    <!-- VISTA 2: L22 (MR-03, AJUSTE CAUDALÍMETRO +0,005)          -->
     <!-- ========================================================= -->
     <div id="view-m2" class="view-section">
         <div class="input-card m2-theme">
             <div class="card-header">
-                <span class="card-title">Mezcladora 2 (MR-03) — Introduce solo 2 datos</span>
-                <span class="badge-sensor badge-ok">Sensor OK</span>
+                <span class="card-title">L22 — Introduce solo 2 datos</span>
+                <span class="badge-sensor badge-info" id="m2-badge">Caudalímetro: +0,005</span>
             </div>
             <div class="two-inputs">
                 <div class="field-box">
@@ -679,14 +759,14 @@
                     PONER EN VALOR NOMINAL OFFSET:
                     <small>Sensor leerá <span id="m2-banner-sensor">54,88</span> °Brix</small>
                 </div>
-                <div class="offset-banner-value" id="m2-banner-offset">+0,000</div>
+                <div class="offset-banner-value" id="m2-banner-offset">+0,005</div>
             </div>
         </div>
 
-        <!-- PANTALLA KRONES HMI - MEZCLADORA 2 -->
+        <!-- PANTALLA KRONES HMI - L22 -->
         <div class="hmi-panel">
             <div class="hmi-top-bar">
-                <span>Valor Brix (Mezcladora 2)</span>
+                <span>Valor Brix (L22)</span>
                 <span>DO01</span>
             </div>
             <div class="hmi-subtabs">
@@ -748,13 +828,13 @@
                         <div class="hmi-box offset-highlight-box">
                             <div class="hmi-box-title">Valor nominal offset</div>
                             <div class="hmi-val-box editable-offset">
-                                <input type="text" id="m2-offset-nom" inputmode="decimal" value="0,000" oninput="recalcularConOffsetManual(2)">
+                                <input type="text" id="m2-offset-nom" inputmode="decimal" value="0,005" oninput="recalcularConOffsetManual(2)">
                             </div>
                         </div>
                         <div class="hmi-equals">=</div>
                         <div class="hmi-box">
                             <div class="hmi-box-title">Valor nominal del componente</div>
-                            <div class="hmi-val-box" id="m2-componente">0,999</div>
+                            <div class="hmi-val-box" id="m2-componente">1,004</div>
                         </div>
                     </div>
 
@@ -769,30 +849,30 @@
         <div class="footer-card">
             <div class="resumen-text" id="m2-resumen"></div>
             <details class="adv-settings">
-                <summary>Ajuste de sensor / caudalímetro (ej. +0,005 en MR-03)</summary>
+                <summary>Ajuste de sensor / caudalímetro (se guarda solo en el móvil)</summary>
                 <div class="adv-grid">
                     <div class="adv-field">
                         <label for="m2-desfase">Desfase Sensor (°Bx):</label>
-                        <input type="text" id="m2-desfase" inputmode="decimal" value="0,00" oninput="recalcularAuto(2)">
+                        <input type="text" id="m2-desfase" inputmode="decimal" value="0,00" oninput="onCalibracionChange(2)">
                     </div>
                     <div class="adv-field">
                         <label for="m2-trim">Ajuste extra caudalímetro:</label>
-                        <input type="text" id="m2-trim" inputmode="decimal" value="0,000" oninput="recalcularAuto(2)">
+                        <input type="text" id="m2-trim" inputmode="decimal" value="0,005" oninput="onCalibracionChange(2)">
                     </div>
                 </div>
-                <button class="reset-link" onclick="resetMezcladora(2)">Restaurar datos por defecto (Mezcladora 2)</button>
+                <button class="reset-link" onclick="resetMezcladora(2)">Restaurar datos por defecto (L22)</button>
             </details>
         </div>
     </div>
 
     <!-- ========================================================= -->
-    <!-- VISTA 3: MEZCLADORA 3 (L20 / L22 - DO01 MANDO BRIX)       -->
+    <!-- VISTA 3: L20 (DO01 MANDO BRIX - 1 DECIMAL)                -->
     <!-- ========================================================= -->
     <div id="view-m3" class="view-section">
         <div class="input-card m3-theme">
             <div class="card-header">
-                <span class="card-title">Mezcladora 3 (L20/L22) — Introduce solo 2 datos</span>
-                <span class="badge-sensor badge-ok">Sensor OK</span>
+                <span class="card-title">L20 — Introduce solo 2 datos</span>
+                <span class="badge-sensor badge-ok" id="m3-badge">Sensor OK</span>
             </div>
             <div class="two-inputs">
                 <div class="field-box">
@@ -817,10 +897,10 @@
             </div>
         </div>
 
-        <!-- PANTALLA KRONES HMI - MEZCLADORA 3 (DO01 MANDO BRIX) -->
+        <!-- PANTALLA KRONES HMI - L20 (DO01 MANDO BRIX) -->
         <div class="hmi-panel">
             <div class="hmi-top-bar m3-bar">
-                <span>DO01 Mando Brix (L20 / L22)</span>
+                <span>DO01 Mando Brix (L20)</span>
                 <span>DO01</span>
             </div>
             <div class="hmi-subtabs">
@@ -903,24 +983,24 @@
         <div class="footer-card">
             <div class="resumen-text" id="m3-resumen"></div>
             <details class="adv-settings">
-                <summary>Ajuste de sensor / caudalímetro (solo si calibran máquina)</summary>
+                <summary>Ajuste de sensor / caudalímetro (se guarda solo en el móvil)</summary>
                 <div class="adv-grid">
                     <div class="adv-field">
                         <label for="m3-desfase">Desfase Sensor (°Bx):</label>
-                        <input type="text" id="m3-desfase" inputmode="decimal" value="0,00" oninput="recalcularAuto(3)">
+                        <input type="text" id="m3-desfase" inputmode="decimal" value="0,00" oninput="onCalibracionChange(3)">
                     </div>
                     <div class="adv-field">
                         <label for="m3-trim">Ajuste extra caudalímetro:</label>
-                        <input type="text" id="m3-trim" inputmode="decimal" value="0,000" oninput="recalcularAuto(3)">
+                        <input type="text" id="m3-trim" inputmode="decimal" value="0,000" oninput="onCalibracionChange(3)">
                     </div>
                 </div>
-                <button class="reset-link" onclick="resetMezcladora(3)">Restaurar datos por defecto (Mezcladora 3)</button>
+                <button class="reset-link" onclick="resetMezcladora(3)">Restaurar datos por defecto (L20)</button>
             </details>
         </div>
     </div>
 
     <!-- ========================================================= -->
-    <!-- VISTA 4: TUS CALCULADORAS ANTERIORES (LAB Y TANQUE 800L)  -->
+    <!-- VISTA 4: CALCULADORAS DE LABORATORIO Y TANQUE 800L        -->
     <!-- ========================================================= -->
     <div id="view-lab" class="view-section">
         <div class="container">
@@ -945,16 +1025,32 @@
             </div>
         </div>
 
-        <div class="container">
+        <div class="container" id="card-correccion-tanque">
             <h2 class="title-brix">2. Corrección Tanque (BRIX)</h2>
+
+            <!-- INSTRUCCIONES CLARAS DE QUÉ METER EN CADA CASILLA -->
+            <div class="tank-guide">
+                <div class="tank-guide-title">Guía rápida (¡NO mezcles Fresco con Invertido!):</div>
+                Usa <strong>TODO en Invertido (alto)</strong> o <strong>TODO en Fresco (bajo)</strong>:
+                <ul>
+                    <li><strong>Brix del Jarabe (Entrada):</strong> Pon el jarabe <em>invertido</em> (ej. <strong>55,50</strong>) si vas en invertido, o el <em>fresco</em> (ej. <strong>54,85</strong>) si vas en fresco.</li>
+                    <li><strong>Brix 1ª Mezcla (Tanque):</strong> Pon el valor <strong>más ALTO</strong> del aparato (si vas en invertido) o el <strong>más BAJO</strong> (si vas en fresco).</li>
+                    <li><strong>Brix Objetivo Final:</strong> Pon <strong>10,50</strong> (en invertido total) o <strong>10,37</strong> (en fresco). Si la inversión es parcial, usa primero la calculadora morada de abajo.</li>
+                </ul>
+            </div>
+
             <label class="lab-label" for="brixJarabeCorr">Brix del Jarabe (Entrada):</label>
-            <input type="text" id="brixJarabeCorr" class="lab-input" inputmode="decimal" placeholder="Ej: 54,87" oninput="calcularCorreccionBrix()">
+            <input type="text" id="brixJarabeCorr" class="lab-input" inputmode="decimal" placeholder="Fresco: 54,85 | Invertido: 55,50" oninput="calcularCorreccionBrix()">
             <label class="lab-label" for="densidadCorrBrix">Densidad Jarabe (kg/L):</label>
             <input type="text" id="densidadCorrBrix" class="lab-input" inputmode="decimal" value="1,26" oninput="calcularCorreccionBrix()">
             <label class="lab-label" for="brixActualCorr">Brix 1ª Mezcla (Tanque):</label>
-            <input type="text" id="brixActualCorr" class="lab-input" inputmode="decimal" placeholder="Ej: 10,22" oninput="calcularCorreccionBrix()">
+            <input type="text" id="brixActualCorr" class="lab-input" inputmode="decimal" placeholder="Fresco: valor BAJO | Inv: valor ALTO" oninput="calcularCorreccionBrix()">
             <label class="lab-label" for="brixObjetivoCorr">Brix Objetivo Final:</label>
             <input type="text" id="brixObjetivoCorr" class="lab-input" inputmode="decimal" value="10,37" oninput="calcularCorreccionBrix()">
+
+            <!-- AVISO AUTOMÁTICO SI SE MEZCLAN ESCALAS -->
+            <div class="scale-warning" id="avisoEscalaTanque"></div>
+
             <div class="result-box">
                 <div class="sub-text" id="brixSegundoCorr">Brix para compensar: 0,00</div>
                 <div style="font-weight: bold; margin-bottom: 4px; margin-top: 8px;">Nuevo Ratio de Agua:</div>
@@ -970,7 +1066,7 @@
             <label class="lab-label" for="labAlto">Brix ALTO del aparato (Invertido):</label>
             <input type="text" id="labAlto" class="lab-input" inputmode="decimal" placeholder="Ej: 10,29" oninput="calcularInversionLab()">
             <label class="lab-label" for="jarabeBaseLab" style="margin-top: 12px; border-top: 1px dashed #ccc; padding-top: 8px;">Brix Jarabe Normal (Receta):</label>
-            <input type="text" id="jarabeBaseLab" class="lab-input" inputmode="decimal" value="54,8" oninput="calcularInversionLab()">
+            <input type="text" id="jarabeBaseLab" class="lab-input" inputmode="decimal" value="54,85" oninput="calcularInversionLab()">
             <label class="lab-label" for="objetivoBaseLab">Nominal Bebida Normal (Base):</label>
             <input type="text" id="objetivoBaseLab" class="lab-input" inputmode="decimal" value="10,37" oninput="calcularInversionLab()">
             <div class="result-box">
@@ -978,18 +1074,31 @@
                 <div class="main-value color-inv" id="resNuevoObjetivo">0,00</div>
                 <div style="font-weight: bold; margin-bottom: 4px; margin-top: 12px; color: #444;">2. Brix Jarabe Invertido:</div>
                 <div class="main-value color-inv" style="font-size: 1.7em;" id="resJarabeInvertido">0,00</div>
-                <div class="note">* Copia este jarabe si necesitas usar la calculadora Azul.</div>
+
+                <button class="transfer-btn" onclick="copiarATanque()">Copiar datos a Corrección Tanque (Azul)</button>
+
+                <div class="send-lines-wrap">
+                    <div class="send-lines-label">O enviar esta inversión directa a una línea:</div>
+                    <div class="send-lines-btns">
+                        <button class="send-line-btn" onclick="enviarInversionALinea(1)">Enviar a L21</button>
+                        <button class="send-line-btn" onclick="enviarInversionALinea(2)">Enviar a L22</button>
+                        <button class="send-line-btn" onclick="enviarInversionALinea(3)">Enviar a L20</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        /* PARÁMETROS FIJOS DE RECETA DE CADA MEZCLADORA (COMO EN TUS FOTOS) */
+        /* PARÁMETROS FIJOS Y VALORES POR DEFECTO DE CADA LÍNEA */
         const MEZCLADORAS = {
-            1: { prodNom: 10.50, agua: 5.400, decSensor: 2 },
-            2: { prodNom: 10.37, agua: 5.400, decSensor: 2 },
-            3: { prodNom: 10.40, agua: 5.400, decSensor: 1 }
+            1: { nombre: 'L21', prodNom: 10.50, agua: 5.400, decSensor: 2, defJarabe: '54,83', defDesfase: '-0,40', defTrim: '0,000' },
+            2: { nombre: 'L22', prodNom: 10.37, agua: 5.400, decSensor: 2, defJarabe: '54,88', defDesfase: '0,00',  defTrim: '0,005' },
+            3: { nombre: 'L20', prodNom: 10.40, agua: 5.400, decSensor: 1, defJarabe: '54,90', defDesfase: '0,00',  defTrim: '0,000' }
         };
+
+        let ultimoObjInv = 0;
+        let ultimoJarabeInv = 0;
 
         function parseNum(val) {
             if (val === null || val === undefined || val === '') return NaN;
@@ -1029,6 +1138,50 @@
             recalcularAuto(m);
         }
 
+        /* ACTUALIZA ETIQUETAS VISUALES DE DESFASE / CAUDALÍMETRO */
+        function actualizarEtiquetas(m) {
+            const desfase = parseNum(document.getElementById(`m${m}-desfase`).value) || 0;
+            const trim = parseNum(document.getElementById(`m${m}-trim`).value) || 0;
+            const badge = document.getElementById(`m${m}-badge`);
+            const tabSub = document.getElementById(`tab-sub-m${m}`);
+
+            if (Math.abs(desfase) >= 0.01) {
+                badge.className = 'badge-sensor badge-warn';
+                badge.innerText = `Sensor: ${fmtSigned(desfase, 2)} °Bx`;
+                tabSub.innerText = `Sensor ${fmtSigned(desfase, 2)}`;
+            } else if (Math.abs(trim) >= 0.001) {
+                badge.className = 'badge-sensor badge-info';
+                badge.innerText = `Caudalímetro: ${fmtSigned(trim, 3)}`;
+                tabSub.innerText = `Caud. ${fmtSigned(trim, 3)}`;
+            } else {
+                badge.className = 'badge-sensor badge-ok';
+                badge.innerText = 'Sensor OK';
+                tabSub.innerText = 'Sensor OK';
+            }
+        }
+
+        /* GUARDAR / CARGAR AJUSTES EN EL MÓVIL */
+        function onCalibracionChange(m) {
+            try {
+                localStorage.setItem(`brix_m${m}_desfase`, document.getElementById(`m${m}-desfase`).value);
+                localStorage.setItem(`brix_m${m}_trim`, document.getElementById(`m${m}-trim`).value);
+            } catch (e) {}
+            actualizarEtiquetas(m);
+            recalcularAuto(m);
+        }
+
+        function cargarAjustesGuardados() {
+            [1, 2, 3].forEach(m => {
+                try {
+                    const d = localStorage.getItem(`brix_m${m}_desfase`);
+                    const t = localStorage.getItem(`brix_m${m}_trim`);
+                    if (d !== null) document.getElementById(`m${m}-desfase`).value = d;
+                    if (t !== null) document.getElementById(`m${m}-trim`).value = t;
+                } catch (e) {}
+                actualizarEtiquetas(m);
+            });
+        }
+
         /* MODO AUTOMÁTICO: AL TOCAR BRIX JARABE O BRIX BEBIDA -> CALCULA EL OFFSET NECESARIO */
         function recalcularAuto(m) {
             const cfg = MEZCLADORAS[m];
@@ -1044,23 +1197,22 @@
                 return;
             }
 
-            // 1. Lo que leerá el sensor de la mezcladora (aplicando el desfase de -0,46 en Mezcladora 1)
+            // 1. Lectura esperada del sensor de jarabe
             const rawSensor = jarabeLab + desfase;
             const jarabeSensor = parseFloat(rawSensor.toFixed(cfg.decSensor));
 
             document.getElementById(`m${m}-jarabe-sensor`).innerText = fmt(jarabeSensor, cfg.decSensor) + ' °Brix';
             document.getElementById(`m${m}-banner-sensor`).innerText = fmt(jarabeSensor, cfg.decSensor);
 
-            // 2. Factor base que calcula solo el círculo del PLC con su consigna fija (10,50 / 10,37 / 10,4)
+            // 2. Factor base del círculo del PLC
             const factorBasePLC = cfg.agua / ratioNecesario(jarabeSensor, cfg.prodNom);
 
-            // 3. Componente físico necesario para sacar la bebida en el Brix deseado con el jarabe real
+            // 3. Componente físico necesario para el Brix deseado
             const componenteNecesario = cfg.agua / ratioNecesario(jarabeLab, brixDeseado);
 
-            // 4. Offset exacto que hay que poner en la mezcladora
+            // 4. Offset exacto a poner (incluyendo ajuste de caudalímetro si aplica)
             const offsetNecesario = (componenteNecesario - factorBasePLC) + trim;
 
-            // Mostrar en banner grande y dentro de la pantalla HMI
             document.getElementById(`m${m}-banner-offset`).innerText = fmtSigned(offsetNecesario, 3);
             document.getElementById(`m${m}-offset-nom`).value = fmt(offsetNecesario, 3);
             document.getElementById(`m${m}-componente`).innerText = fmt(componenteNecesario + trim, 3);
@@ -1069,11 +1221,11 @@
             prodEl.innerText = fmt(brixDeseado, 2) + ' °Brix';
             prodEl.className = 'hmi-val-box prod-good';
 
-            // Resumen
             const ratioReal = cfg.agua / componenteNecesario;
+            const notaTrim = Math.abs(trim) >= 0.001 ? ` (incluye ajuste caudalímetro ${fmtSigned(trim, 3)})` : '';
             document.getElementById(`m${m}-resumen`).innerHTML =
                 `El círculo del PLC calcula un factor base de <strong>${fmt(factorBasePLC, 3)}</strong>.<br>` +
-                `Al poner el offset en <strong>${fmtSigned(offsetNecesario, 3)}</strong>, la mezcladora deja el componente en <strong>${fmt(componenteNecesario + trim, 3)}</strong> (relación 1 : ${fmt(ratioReal, 2)}) y clava la bebida en <strong>${fmt(brixDeseado, 2)} °Brix</strong>.`;
+                `Al poner el offset en <strong>${fmtSigned(offsetNecesario, 3)}</strong>${notaTrim}, el componente queda en <strong>${fmt(componenteNecesario + trim, 3)}</strong> (relación real 1 : ${fmt(ratioReal, 2)}) y clava la bebida en <strong>${fmt(brixDeseado, 2)} °Brix</strong>.`;
         }
 
         /* MODO SIMULACIÓN MANUAL: SI TOCAS EL OFFSET DENTRO DE LA PANTALLA HMI */
@@ -1119,26 +1271,20 @@
         }
 
         function resetMezcladora(m) {
-            if (m === 1) {
-                document.getElementById('m1-jarabe-lab').value = '54,90';
-                document.getElementById('m1-brix-deseado').value = '10,37';
-                document.getElementById('m1-desfase').value = '-0,46';
-                document.getElementById('m1-trim').value = '0,000';
-            } else if (m === 2) {
-                document.getElementById('m2-jarabe-lab').value = '54,88';
-                document.getElementById('m2-brix-deseado').value = '10,37';
-                document.getElementById('m2-desfase').value = '0,00';
-                document.getElementById('m2-trim').value = '0,000';
-            } else {
-                document.getElementById('m3-jarabe-lab').value = '54,90';
-                document.getElementById('m3-brix-deseado').value = '10,37';
-                document.getElementById('m3-desfase').value = '0,00';
-                document.getElementById('m3-trim').value = '0,000';
-            }
+            const cfg = MEZCLADORAS[m];
+            document.getElementById(`m${m}-jarabe-lab`).value = cfg.defJarabe;
+            document.getElementById(`m${m}-brix-deseado`).value = '10,37';
+            document.getElementById(`m${m}-desfase`).value = cfg.defDesfase;
+            document.getElementById(`m${m}-trim`).value = cfg.defTrim;
+            try {
+                localStorage.removeItem(`brix_m${m}_desfase`);
+                localStorage.removeItem(`brix_m${m}_trim`);
+            } catch (e) {}
+            actualizarEtiquetas(m);
             recalcularAuto(m);
         }
 
-        /* LÓGICA PESTAÑA 4: CALCULADORAS ANTERIORES */
+        /* LÓGICA PESTAÑA 4: CALCULADORAS DE LABORATORIO */
         function updateUINormal() {
             const select = document.getElementById('producto');
             const option = select.options[select.selectedIndex];
@@ -1185,6 +1331,22 @@
             const densidad = parseNum(document.getElementById('densidadCorrBrix').value);
             const brixActual = parseNum(document.getElementById('brixActualCorr').value);
             const brixObjetivo = parseNum(document.getElementById('brixObjetivoCorr').value);
+            const avisoEl = document.getElementById('avisoEscalaTanque');
+
+            // Detector de mezcla de escalas en Coca-Cola (fresco vs invertido)
+            if (!isNaN(brixJarabe) && !isNaN(brixObjetivo) && brixObjetivo >= 9.0) {
+                if (brixJarabe >= 55.20 && brixObjetivo <= 10.40) {
+                    avisoEl.style.display = 'block';
+                    avisoEl.innerText = '⚠️ Cuidado: has puesto jarabe INVERTIDO (' + fmt(brixJarabe, 2) + ') con objetivo FRESCO (' + fmt(brixObjetivo, 2) + '). Si usas escala invertida, pon 10,50 en Objetivo y el valor ALTO del aparato en 1ª Mezcla.';
+                } else if (brixJarabe >= 53.0 && brixJarabe <= 55.00 && brixObjetivo >= 10.46) {
+                    avisoEl.style.display = 'block';
+                    avisoEl.innerText = '⚠️ Cuidado: has puesto jarabe FRESCO (' + fmt(brixJarabe, 2) + ') con objetivo INVERTIDO (' + fmt(brixObjetivo, 2) + '). Cambia el objetivo a 10,37 o pon el jarabe invertido arriba.';
+                } else {
+                    avisoEl.style.display = 'none';
+                }
+            } else {
+                avisoEl.style.display = 'none';
+            }
 
             if (brixJarabe > 0 && densidad > 0 && brixActual > 0 && brixObjetivo > 0) {
                 const brixSegundo = brixObjetivo + (brixObjetivo - brixActual);
@@ -1206,15 +1368,47 @@
 
             if (labBajo > 0 && labAlto > 0 && jarabeBase > 0 && objetivoBase > 0) {
                 const factor = labAlto / labBajo;
-                document.getElementById('resNuevoObjetivo').innerText = fmt(objetivoBase * factor, 2);
-                document.getElementById('resJarabeInvertido').innerText = fmt(jarabeBase * factor, 2);
+                ultimoObjInv = objetivoBase * factor;
+                ultimoJarabeInv = jarabeBase * factor;
+                document.getElementById('resNuevoObjetivo').innerText = fmt(ultimoObjInv, 2);
+                document.getElementById('resJarabeInvertido').innerText = fmt(ultimoJarabeInv, 2);
             } else {
+                ultimoObjInv = 0;
+                ultimoJarabeInv = 0;
                 document.getElementById('resNuevoObjetivo').innerText = '0,00';
                 document.getElementById('resJarabeInvertido').innerText = '0,00';
             }
         }
 
-        // Inicializar al abrir
+        function copiarATanque() {
+            const labAlto = parseNum(document.getElementById('labAlto').value);
+            if (ultimoObjInv <= 0 || ultimoJarabeInv <= 0) {
+                alert('Introduce primero el Brix BAJO y el Brix ALTO del aparato de laboratorio.');
+                return;
+            }
+            document.getElementById('brixJarabeCorr').value = fmt(ultimoJarabeInv, 2);
+            if (labAlto > 0) {
+                document.getElementById('brixActualCorr').value = fmt(labAlto, 2);
+            }
+            document.getElementById('brixObjetivoCorr').value = fmt(ultimoObjInv, 2);
+            calcularCorreccionBrix();
+            document.getElementById('card-correccion-tanque').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function enviarInversionALinea(m) {
+            if (ultimoObjInv <= 0 || ultimoJarabeInv <= 0) {
+                alert('Introduce primero el Brix BAJO y el Brix ALTO del aparato de laboratorio.');
+                return;
+            }
+            document.getElementById(`m${m}-jarabe-lab`).value = fmt(ultimoJarabeInv, 2);
+            document.getElementById(`m${m}-brix-deseado`).value = fmt(ultimoObjInv, 2);
+            switchTab('m' + m);
+            recalcularAuto(m);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Inicializar todo al abrir
+        cargarAjustesGuardados();
         recalcularAuto(1);
         recalcularAuto(2);
         recalcularAuto(3);
